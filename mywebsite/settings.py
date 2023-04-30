@@ -26,7 +26,8 @@ SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['django-chat-intro-production.up.railway.app']
+ALLOWED_HOSTS = ['127.0.0.1',
+                 'django-chat-intro-production.up.railway.app']
 
 
 # Application definition
@@ -44,12 +45,18 @@ INSTALLED_APPS = [
 
 ASGI_APPLICATION = 'mywebsite.asgi.application'
 
+# CHANNEL_LAYERS = {
+#     'default':{
+#         'BACKEND':"channels_redis.core.RedisChannelLayer",
+#         'CONFIG': {
+#             'hosts': [('127.0.0.1', 6379)],
+#         }
+#     }
+# }
+
 CHANNEL_LAYERS = {
     'default':{
-        'BACKEND':'channels.layers.InMemoryChannelLayer',
-        'CONFIG': {
-            'hosts': [('127.0.0.1', 6379)],
-        }
+        'BACKEND':'channels.layers.InMemoryChannelLayer'
     }
 }
 
