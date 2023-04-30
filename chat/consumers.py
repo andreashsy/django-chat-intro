@@ -15,7 +15,6 @@ class ChatConsumer(WebsocketConsumer):
         self.accept()
         print(f"Group {self.room_group_name} has {len(self.channel_layer.groups.get(self.room_group_name, {}).items())} connection(s)")
 
-
     def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
         print(f'{str(datetime.now())} - Message received: ', text_data_json)
@@ -58,3 +57,4 @@ class ChatConsumer(WebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
+        print(f"Group {self.room_group_name} has {len(self.channel_layer.groups.get(self.room_group_name, {}).items())} connection(s)")
