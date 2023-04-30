@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 
@@ -15,7 +16,7 @@ class ChatConsumer(WebsocketConsumer):
 
     def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
-        print('Message received: ', text_data_json)
+        print(f'{str(datetime.now())} - Message received: ', text_data_json)
         message = text_data_json['message']
         user_id = text_data_json['userId']
 
