@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lobby</title>
 </head>
-<body>
-    <h1>Let's chat</h1>
+<body onload="init()">
+    <h1>Let's chat!<span id="user"></span></h1>
 
     <form id="form">
         <input type="text" name="message"/>
@@ -18,6 +18,12 @@
     </div>
 
     <script type="text/javascript">
+        function init() {
+            var number = Math.floor(Math.random() * 1000)
+            window.user = " user" + number
+            document.getElementById("user").innerHTML = user
+        }
+        
         let url = ''
         if (location.protocol !== "https:") {
             url = `ws://${window.location.host}/ws/socket-server`
@@ -27,6 +33,15 @@
 
         const chatSocket = new WebSocket(url)
 
+        chatSocket.onopen = function(e) {
+            chatSocket.send(
+                JSON.stringify({
+                    'userId': user,
+                    'message': 'Connection Established!' 
+                })
+            )
+        }
+
         chatSocket.onmessage = function(e){
             let data = JSON.parse(e.data)
             console.log('Data: ', data)
@@ -35,7 +50,7 @@
                 let message = document.getElementById('messages')
 
                 messages.insertAdjacentHTML('beforeend', `<div>
-                                            <p>${data.message}</p>
+                                            <p>${data.userId}: ${data.message}</p>
                                             </div>`)
             }
         }
@@ -45,6 +60,7 @@
             e.preventDefault()
             let message = e.target.message.value
             chatSocket.send(JSON.stringify({
+                'userId': user,
                 'message': message
             }))
             form.reset()
