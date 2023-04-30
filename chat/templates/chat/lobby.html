@@ -18,8 +18,12 @@
     </div>
 
     <script type="text/javascript">
-        let url = `wss://${window.location.host}/ws/socket-server`
-        console.log(url)
+        let url = ''
+        if (location.protocol !== "https:") {
+            url = `ws://${window.location.host}/ws/socket-server`
+        } else {
+            url = `wss://${window.location.host}/ws/socket-server`
+        }
 
         const chatSocket = new WebSocket(url)
 
