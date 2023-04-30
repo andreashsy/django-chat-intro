@@ -31,7 +31,7 @@ ALLOWED_HOSTS = ['127.0.0.1',
                  'django-chat-intro-production.up.railway.app']
 
 runserver.default_addr = '0.0.0.0'
-runserver.default_port = '8000'
+# runserver.default_port = '8000'
 
 # Application definition
 
