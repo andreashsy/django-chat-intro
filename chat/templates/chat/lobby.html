@@ -36,8 +36,8 @@
         chatSocket.onopen = function(e) {
             chatSocket.send(
                 JSON.stringify({
-                    'userId': user,
-                    'message': 'Connection Established!' 
+                    'userId': "Server",
+                    'message': user + ' has connected!' 
                 })
             )
         }

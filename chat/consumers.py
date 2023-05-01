@@ -41,6 +41,14 @@ class ChatConsumer(WebsocketConsumer):
             'message':message,
             'userId': user_id
         }))
+
+    def server_message(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'type':'chat',
+            'message':message,
+            'userId': "Server"
+        }))
     
     def disconnect(self, code=None):
         print(f'{str(datetime.now())} - {self.user_id} disconnecting!')
@@ -48,13 +56,12 @@ class ChatConsumer(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
-                'type':'chat_message',
-                'message': 'Disconnected!',
-                'userId': self.user_id
+                'type':'server_message',
+                'message': f'{self.user_id} has disconnected!',
             }
         )
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name,
             self.channel_name
         )
-        print(f"{str(datetime.now())} - Group {self.room_group_name} has {len(self.channel_layer.groups.get(self.room_group_name, {}).items())} connection(s)")
+        print(f"{str(datetime.now())} - Group <{self.room_group_name}> has {len(self.channel_layer.groups.get(self.room_group_name, {}).items())} connection(s)")
