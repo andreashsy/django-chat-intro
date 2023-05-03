@@ -1,21 +1,21 @@
 import json
 from datetime import datetime
-from channels.generic.websocket import WebsocketConsumer
+from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 from asgiref.sync import async_to_sync
 
-class ChatConsumer(WebsocketConsumer):
-    def connect(self):
+class ChatConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
         self.room_group_name = 'test'
         self.user_id = None
 
-        async_to_sync(self.channel_layer.group_add)(
+        await (self.channel_layer.group_add)(
             self.room_group_name,
             self.channel_name
         )
-        self.accept()
+        await self.accept()
         print(f"{str(datetime.now())} - Group {self.room_group_name} has {len(self.channel_layer.groups.get(self.room_group_name, {}).items())} connection(s)")
 
-    def receive(self, text_data=None, bytes_data=None):
+    async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
         print(f'{str(datetime.now())} - Message received: ', text_data_json)
         message = text_data_json['message']
@@ -23,7 +23,7 @@ class ChatConsumer(WebsocketConsumer):
         if not self.user_id:
             self.user_id = user_id
 
-        async_to_sync(self.channel_layer.group_send)(
+        await (self.channel_layer.group_send)(
             self.room_group_name,
             {
                 'type':'chat_message',
@@ -32,35 +32,35 @@ class ChatConsumer(WebsocketConsumer):
             }
         )
 
-    def chat_message(self, event):
+    async def chat_message(self, event):
         message = event['message']
         user_id = event['userId']
 
-        self.send(text_data=json.dumps({
+        await self.send(text_data=json.dumps({
             'type':'chat',
             'message':message,
             'userId': user_id
         }))
 
-    def server_message(self, event):
+    async def server_message(self, event):
         message = event['message']
-        self.send(text_data=json.dumps({
+        await self.send(text_data=json.dumps({
             'type':'chat',
             'message':message,
             'userId': "Server"
         }))
     
-    def disconnect(self, code=None):
+    async def disconnect(self, code=None):
         print(f'{str(datetime.now())} - {self.user_id} disconnecting!')
 
-        async_to_sync(self.channel_layer.group_send)(
+        await (self.channel_layer.group_send)(
             self.room_group_name,
             {
                 'type':'server_message',
                 'message': f'{self.user_id} has disconnected!',
             }
         )
-        async_to_sync(self.channel_layer.group_discard)(
+        await (self.channel_layer.group_discard)(
             self.room_group_name,
             self.channel_name
         )
