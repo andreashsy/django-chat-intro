@@ -7,9 +7,18 @@
     <title>Lobby</title>
 </head>
 <body onload="init()">
+    <div>
+        <h1>Rock Paper Scissors</h1>
+        <form id="rps-form">
+            <input type="radio" name="move" value="rock">Rock<br>
+            <input type="radio" name="move" value="paper">Paper<br>
+            <input type="radio" name="move" value="scissors">Scissors<br><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
     <h1>Let's chat!<span id="user"></span></h1>
 
-    <form id="form">
+    <form id="chat-form">
         <input type="text" name="message"/>
     </form>
 
@@ -66,17 +75,28 @@
             chatSocket.close()
         }
 
-        let form = document.getElementById('form')
-        form.addEventListener('submit', (e)=> {
+        let chat_form = document.getElementById('chat-form')
+        chat_form.addEventListener('submit', (e)=> {
             e.preventDefault()
             let message = e.target.message.value
             chatSocket.send(JSON.stringify({
                 'userId': user,
                 'message': message
             }))
-            form.reset()
+            chat_form.reset()
         })
-
+        
+        let rps_form = document.getElementById('rps-form')
+        rps_form.addEventListener('submit', (e)=> {
+            e.preventDefault()
+            let choice = document.querySelector('input[name="move"]:checked').value
+            chatSocket.send(JSON.stringify({
+                'userId': user,
+                'message': 'user has chosen ' + choice
+            }))
+            rps_form.reset()
+        })
+        
     </script>
 </body>
 </html>
