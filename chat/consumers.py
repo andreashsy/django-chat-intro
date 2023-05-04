@@ -34,6 +34,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 message = "I've made a game choice!"
             else:
                 print(f'game state: {str(game_state)}') # debug
+                cache.delete('game_state')
                 other_player, other_choice = [(k, v) for k, v in game_state.items()][0]
                 is_win = (choice == 'rock' and other_choice == 'scissors') or (choice == 'paper' and other_choice == 'rock') or (choice == 'scissors' and other_choice == 'paper')
                 if other_choice == choice:
