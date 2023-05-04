@@ -46,7 +46,8 @@
             chatSocket.send(
                 JSON.stringify({
                     'userId': "Server",
-                    'message': user + ' has connected!' 
+                    'message': user + ' has connected!',
+                    'type': 'server_message'
                 })
             )
         }
@@ -68,7 +69,8 @@
             chatSocket.send(
                 JSON.stringify({
                     'userId': user,
-                    'message': user + 'has disconnected!' 
+                    'message': user + 'has disconnected!',
+                    'type': 'server_message'
                 })
             )
 
@@ -81,7 +83,8 @@
             let message = e.target.message.value
             chatSocket.send(JSON.stringify({
                 'userId': user,
-                'message': message
+                'message': message,
+                'type': 'message'
             }))
             chat_form.reset()
         })
@@ -92,7 +95,8 @@
             let choice = document.querySelector('input[name="move"]:checked').value
             chatSocket.send(JSON.stringify({
                 'userId': user,
-                'message': 'user has chosen ' + choice
+                'message': choice,
+                'type': 'game_move'
             }))
             rps_form.reset()
         })
