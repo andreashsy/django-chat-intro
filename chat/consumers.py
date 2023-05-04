@@ -28,10 +28,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if msg_type == 'game_move':
             choice = message
             game_state = cache.get('game_state')
+            user_id = 'Server'
             if not game_state:
                 game_state = {self.user_id: choice}
                 cache.set('game_state', game_state)
-                message = "I've made a game choice!"
+                message = f"{self.user_id} made a game choice!"
+
             else:
                 print(f'game state: {str(game_state)}') # debug
                 cache.delete('game_state')
@@ -43,7 +45,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     message = f"{self.user_id}'s {choice} wins against {other_player}'s {other_choice}!"
                 else:
                     message = f"{self.user_id}'s {choice} loses to {other_player}'s {other_choice}!"
-                user_id = 'Server'
 
         await (self.channel_layer.group_send)(
             self.room_group_name,
