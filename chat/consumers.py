@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 from channels.generic.websocket import AsyncWebsocketConsumer
+from django.core.cache import cache
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -16,6 +17,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
+        last_msg = cache.get('last_message')
+        if last_msg:
+            print(f"cached last message: " + last_msg)
+        cache.set('last_message', text_data_json['message'], None)
         print(f'{str(datetime.now())} - Message received: ', text_data_json)
         message = text_data_json['message']
         user_id = text_data_json['userId']
