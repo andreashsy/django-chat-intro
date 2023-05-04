@@ -45,7 +45,7 @@
         chatSocket.onopen = function(e) {
             chatSocket.send(
                 JSON.stringify({
-                    'userId': "Server",
+                    'userId': "Client-Server",
                     'message': user + ' has connected!',
                     'type': 'server_message'
                 })
@@ -68,7 +68,7 @@
         chatSocket.onclose = function(e){
             chatSocket.send(
                 JSON.stringify({
-                    'userId': user,
+                    'userId': 'Client-Server',
                     'message': user + 'has disconnected!',
                     'type': 'server_message'
                 })
