@@ -1,3 +1,4 @@
+from mywebsite.chat.models.RPSChoice import RPSChoice
 from mywebsite.chat.models.RPSPlayer import RPSPlayer
 from mywebsite.chat.models.RPSGamePhase import RPSGamePhase
 
@@ -5,6 +6,12 @@ class RPSGameState:
     def __init__(self) -> None:
         self.player: RPSPlayer = None
         self.game_state: RPSGamePhase = RPSGamePhase.PREGAME
+
+    def is_player_waiting(self) -> bool:
+        return not self.player
+
+    def add_player(self, player_id: str, choice: RPSChoice) -> None:
+        self.player = RPSPlayer(player_id, choice)
 
     def set_player(self, player: RPSPlayer) -> None:
         self.player = player
