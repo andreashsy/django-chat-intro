@@ -13,6 +13,9 @@ class RPSGameState:
     def add_player(self, player_id: str, choice: RPSChoice) -> None:
         self.player = RPSPlayer(player_id, choice)
 
+    def get_player_details(self) -> tuple[str, str]:
+        return (self.player.player_id, self.player.choice.value)
+
     def set_player(self, player: RPSPlayer) -> None:
         self.player = player
         self.game_state = RPSGamePhase.WAITING_FOR_OPPONENT

@@ -61,7 +61,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             else:
                 current_player = RPSPlayer(self.user_id, RPSChoice(choice))
-                other_player_id, other_choice = game_state.player.player_id, game_state.player.choice.value
+                other_player_id, other_choice = game_state.get_player_details()
                 game_result = game_state.resolve_against(current_player)
                 if game_result == GameResult.DRAW:
                     message = f"Both {self.user_id} and {other_player_id} chose {choice}! It's a draw!"
