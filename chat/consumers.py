@@ -1,4 +1,5 @@
 import json
+import asyncio
 from datetime import datetime
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.core.cache import cache
@@ -14,6 +15,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
         await self.accept()
         print(f"{str(datetime.now())} - Group {self.room_group_name} has {len(self.channel_layer.groups.get(self.room_group_name, {}).items())} connection(s)")
+        asyncio.create_task(self.wait_and_send_msg(3))
+
+    async def wait_and_send_msg(self, seconds: int):
+        await asyncio.sleep(seconds)
+
+        await (self.channel_layer.group_send)(
+        self.room_group_name,
+        {
+            'type':'chat_message',
+            'message':f"{seconds} seconds passed after login!",
+            'userId': "Server"
+        }
+    )
 
     async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
