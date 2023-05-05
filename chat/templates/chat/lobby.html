@@ -16,6 +16,7 @@
             <input type="submit" value="Submit">
         </form>
     </div>
+    <div id="countdown"></div>
     <h1>Let's chat!<span id="user"></span></h1>
 
     <form id="chat-form">
@@ -33,6 +34,19 @@
             document.getElementById("user").innerHTML = " " + user
         }
         
+        function initiateCountdown(seconds) {
+            var timeleft = seconds;
+            var downloadTimer = setInterval(function(){
+            if(timeleft <= 0){
+                clearInterval(downloadTimer);
+                document.getElementById("countdown").innerHTML = "Finished";
+            } else {
+                document.getElementById("countdown").innerHTML = timeleft + " seconds remaining";
+            }
+            timeleft -= 1;
+            }, 1000);
+        }
+
         let url = ''
         if (location.protocol !== "https:") {
             url = `ws://${window.location.host}/ws/socket-server`
@@ -62,6 +76,10 @@
                 messages.insertAdjacentHTML('beforeend', `<div>
                     <p>${data.userId}: ${data.message}</p>
                     </div>`)
+            }
+
+            if(data.userId === 'Server' && data.message.includes("made a game choice!") && !data.message.includes(user)) {
+                initiateCountdown(10)
             }
         }
             
