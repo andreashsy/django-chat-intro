@@ -4,6 +4,12 @@ from datetime import datetime
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.core.cache import cache
 
+from .services.game_service import RPSGameState
+from .models.RPSChoice import RPSChoice
+from .models.RPSPlayer import RPSPlayer
+from .models.GameResult import GameResult
+
+
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_group_name = 'test'
@@ -14,6 +20,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
         await self.accept()
+        
+        if not cache.get('game_state'):
+            game_state = RPSGameState()
+            cache.set('game_state', game_state)
+
         print(f"{str(datetime.now())} - Group {self.room_group_name} has {len(self.channel_layer.groups.get(self.room_group_name, {}).items())} connection(s)")
         asyncio.create_task(self.wait_and_send_msg(3))
 
@@ -41,24 +52,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         if msg_type == 'game_move':
             choice = message
-            game_state = cache.get('game_state')
+            game_state: RPSGameState = cache.get('game_state')
             user_id = 'Server'
-            if not game_state:
-                game_state = {self.user_id: choice}
+            if not game_state.is_player_waiting():
+                game_state.add_player(self.user_id, RPSChoice(choice))
                 cache.set('game_state', game_state)
                 message = f"{self.user_id} made a game choice!"
 
             else:
-                print(f'game state: {str(game_state)}') # debug
-                cache.delete('game_state')
-                other_player, other_choice = [(k, v) for k, v in game_state.items()][0]
-                is_win = (choice == 'rock' and other_choice == 'scissors') or (choice == 'paper' and other_choice == 'rock') or (choice == 'scissors' and other_choice == 'paper')
-                if other_choice == choice:
-                    message = f"Both {self.user_id} and {other_player} chose {choice}! It's a draw!"
-                elif is_win:
-                    message = f"{self.user_id}'s {choice} wins against {other_player}'s {other_choice}!"
+                current_player = RPSPlayer(self.user_id, RPSChoice(choice))
+                other_player_id, other_choice = game_state.player.player_id, game_state.player.choice.value
+                game_result = game_state.resolve_against(current_player)
+                if game_result == GameResult.DRAW:
+                    message = f"Both {self.user_id} and {other_player_id} chose {choice}! It's a draw!"
+                elif game_result == GameResult.WIN:
+                    message = f"{other_player_id}'s {other_choice} wins against {self.user_id}'s {choice}!"
                 else:
-                    message = f"{self.user_id}'s {choice} loses to {other_player}'s {other_choice}!"
+                    message = f"{other_player_id}'s {other_choice} loses against {self.user_id}'s {choice}!"
+                game_state.reset()
+                cache.set('game_state', game_state)
 
         await (self.channel_layer.group_send)(
             self.room_group_name,

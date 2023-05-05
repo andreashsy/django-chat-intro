@@ -1,5 +1,5 @@
-from models.GameResult import GameResult
-from models.RPSChoice import RPSChoice
+from ..models.GameResult import GameResult
+from ..models.RPSChoice import RPSChoice
 
 class RPSPlayer:
     def __init__(self, player_id: str, choice: RPSChoice) -> None:
