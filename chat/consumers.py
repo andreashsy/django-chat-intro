@@ -26,7 +26,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             cache.set('game_state', game_state)
 
         print(f"{str(datetime.now())} - Group {self.room_group_name} has {len(self.channel_layer.groups.get(self.room_group_name, {}).items())} connection(s)")
-        asyncio.create_task(self.wait_and_send_msg(3))
+        # asyncio.create_task(self.wait_and_send_msg(3))
 
     async def wait_and_send_msg(self, seconds: int):
         await asyncio.sleep(seconds)
